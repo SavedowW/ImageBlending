@@ -26,6 +26,7 @@ layersDefaultTuple = (
 
 # Global var with folder path
 folderPath = ""
+deleteAlphaLayer = False
 
 # Global vars with last keyboard press info for double click
 lastChar = 0
@@ -176,6 +177,8 @@ def renderLayers(beauties, layerData):
             # Save base
             blended_img = numpy.uint8(base)
             blended_img_raw = Image.fromarray(blended_img)
+            if (deleteAlphaLayer):
+                blended_img_raw = blended_img_raw.convert("RGB")
             blended_img_raw.save(resFolder + segments[0] + "_Result" + segments[1])
         
         addOutputMessage("Render complete!")
@@ -233,6 +236,10 @@ def layers_parse_callback(sender, app_data):
     dpg.show_item("layer_properties_window")
     addOutputMessage("Selected folder: '" + folderPath + "'")
 
+def remove_alpha_callback(sender, app_data):
+    global deleteAlphaLayer
+    deleteAlphaLayer = app_data
+
 # Folder select window
 dpg.add_file_dialog(
     directory_selector=True, show=False, callback=layers_parse_callback, tag="file_dialog_id", width=700 ,height=400)
@@ -259,6 +266,7 @@ with dpg.window(label="Layer properties", tag="layer_properties_window", width=7
         dpg.add_button(label="Save config", callback=save_config_callback)
         dpg.add_button(label="Load config", callback=load_config_callback)
         dpg.add_button(label="Reset to default", callback=reset_to_default_callback)
+    dpg.add_checkbox(label="Remove alpha layer", callback=remove_alpha_callback)
     dpg.add_button(label="Run render", callback=layers_render_callback)
 
 # Log window
